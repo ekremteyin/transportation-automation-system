@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: nakliye-mssql
+    environment:
+      SA_PASSWORD: "Nakliye_Strong@Pass123"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    networks:
+      - nakliye-net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Nakliye_Strong@Pass123' -Q 'SELECT 1' -No"]
+      interval: 10s
+      retries: 10
+      start_period: 30s
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nakliye-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mssql,1433;Database=NakliyeDb;User Id=sa;Password=Nakliye_Strong@Pass123;TrustServerCertificate=True;
+      - JwtSettings__Secret=NakliyeSuperSecretKey_MinimumLength32Chars!
+      - JwtSettings__Issuer=NakliyeApp
+      - JwtSettings__Audience=NakliyeUsers
+      - JwtSettings__ExpireHours=24
+      - ASPNETCORE_URLS=http://+:5000
+    ports:
+      - "5000:5000"
+    volumes:
+      - api-uploads:/app/uploads
+    depends_on:
+      mssql:
+        condition: service_healthy
+    networks:
+      - nakliye-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nakliye-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    networks:
+      - nakliye-net
+
+volumes:
+  mssql-data:
+  api-uploads:
+
+networks:
+  nakliye-net:
+    driver: bridge

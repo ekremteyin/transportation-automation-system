@@ -1,0 +1,23 @@
+# ── .NET ──────────────────────────────────────────
+backend/**/bin/
+backend/**/obj/
+backend/**/*.user
+backend/.vs/
+backend/**/*.suo
+
+# ── Node / Frontend ───────────────────────────────
+frontend/node_modules/
+frontend/dist/
+
+# ── Environment & secrets ─────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Docker volumes (local data) ───────────────────
+mssql-data/
+
+# ── OS ────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
