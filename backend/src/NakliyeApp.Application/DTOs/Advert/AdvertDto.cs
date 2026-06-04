@@ -16,4 +16,11 @@ public class AdvertDto
     public string Status { get; set; } = string.Empty;
     public int OfferCount { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    public double? OriginLat { get; set; }
+    public double? OriginLng { get; set; }
+    public double? DestLat { get; set; }
+    public double? DestLng { get; set; }
+    public double? DistanceKm { get; set; }
+    public int? EstimatedDurationMin { get; set; }
 }

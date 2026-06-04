@@ -6,6 +6,7 @@ import { getUserReviews } from '../../api/reviewApi';
 import StatusBadge from '../../components/common/StatusBadge';
 import PageHeader from '../../components/common/PageHeader';
 import ReviewForm from '../../components/review/ReviewForm';
+import LocationPicker from '../../components/map/LocationPicker';
 
 function InfoRow({ label, value }) {
   return (
@@ -14,6 +15,15 @@ function InfoRow({ label, value }) {
       <span className="text-slate-800 text-sm font-medium">{value ?? '—'}</span>
     </div>
   );
+}
+
+function formatDuration(min) {
+  if (!min) return '—';
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if (h === 0) return `${m} dk`;
+  if (m === 0) return `${h} sa`;
+  return `${h} sa ${m} dk`;
 }
 
 function StarRating({ value }) {
@@ -112,7 +122,27 @@ export default function AdvertDetail() {
           <InfoRow label="Varış"           value={`${advert.destCity}${advert.destDistrict ? ' / ' + advert.destDistrict : ''}`} />
           <InfoRow label="Taşıma Tarihi"   value={new Date(advert.transportDate).toLocaleDateString('tr-TR')} />
           <InfoRow label="İlan Tarihi"     value={new Date(advert.createdAt).toLocaleDateString('tr-TR')} />
+          {advert.distanceKm != null && (
+            <InfoRow label="Mesafe" value={`${advert.distanceKm} km`} />
+          )}
+          {advert.estimatedDurationMin != null && (
+            <InfoRow label="Tahmini Sürüş" value={formatDuration(advert.estimatedDurationMin)} />
+          )}
         </div>
+
+        {/* Rota haritası */}
+        {advert.originLat && advert.destLat && (
+          <div className="overflow-hidden">
+            <LocationPicker
+              originLat={advert.originLat} originLng={advert.originLng}
+              destLat={advert.destLat}     destLng={advert.destLng}
+              originLabel={`${advert.originCity}${advert.originDistrict ? ' / ' + advert.originDistrict : ''}`}
+              destLabel={`${advert.destCity}${advert.destDistrict ? ' / ' + advert.destDistrict : ''}`}
+              height="300px"
+            />
+          </div>
+        )}
+
         {advert.description && (
           <div className="px-6 py-4">
             <p className="text-xs text-slate-400 uppercase mb-1">Açıklama</p>

@@ -5,7 +5,7 @@ using NakliyeApp.Domain.Enums;
 
 namespace NakliyeApp.Application.Services;
 
-public class AdvertService(IAdvertRepository advertRepo)
+public class AdvertService(IAdvertRepository advertRepo, IGeoService geoService)
 {
     public async Task<AdvertDto> CreateAsync(int senderId, CreateAdvertDto dto)
     {
@@ -21,6 +21,14 @@ public class AdvertService(IAdvertRepository advertRepo)
             TransportDate = dto.TransportDate,
             Description = dto.Description
         };
+
+        var geo = await geoService.GetGeoDataAsync(
+            dto.OriginCity, dto.OriginDistrict,
+            dto.DestCity, dto.DestDistrict);
+
+        if (geo != null)
+            ApplyGeo(advert, geo);
+
         var created = await advertRepo.CreateAsync(advert);
         return MapToDto(created);
     }
@@ -63,6 +71,13 @@ public class AdvertService(IAdvertRepository advertRepo)
         advert.Description = dto.Description;
         advert.UpdatedAt = DateTime.UtcNow;
 
+        var geo = await geoService.GetGeoDataAsync(
+            dto.OriginCity, dto.OriginDistrict,
+            dto.DestCity, dto.DestDistrict);
+
+        if (geo != null)
+            ApplyGeo(advert, geo);
+
         await advertRepo.UpdateAsync(advert);
         return MapToDto(advert);
     }
@@ -87,6 +102,16 @@ public class AdvertService(IAdvertRepository advertRepo)
         return adverts.Select(MapToDto);
     }
 
+    private static void ApplyGeo(Advert advert, GeoData geo)
+    {
+        advert.OriginLat = geo.OriginLat;
+        advert.OriginLng = geo.OriginLng;
+        advert.DestLat = geo.DestLat;
+        advert.DestLng = geo.DestLng;
+        advert.DistanceKm = geo.DistanceKm;
+        advert.EstimatedDurationMin = geo.EstimatedDurationMin;
+    }
+
     private static AdvertDto MapToDto(Advert a) => new()
     {
         Id = a.Id,
@@ -102,6 +127,12 @@ public class AdvertService(IAdvertRepository advertRepo)
         Description = a.Description,
         Status = a.Status.ToString(),
         OfferCount = a.Offers?.Count ?? 0,
-        CreatedAt = a.CreatedAt
+        CreatedAt = a.CreatedAt,
+        OriginLat = a.OriginLat,
+        OriginLng = a.OriginLng,
+        DestLat = a.DestLat,
+        DestLng = a.DestLng,
+        DistanceKm = a.DistanceKm,
+        EstimatedDurationMin = a.EstimatedDurationMin
     };
 }

@@ -108,6 +108,7 @@ export default function OpenAdverts() {
                         <span>📦 {a.cargoType}{a.cargoWeight ? ` · ${a.cargoWeight}` : ''}</span>
                         <span>📅 {new Date(a.transportDate).toLocaleDateString('tr-TR')}</span>
                         <span>👤 {a.senderName}</span>
+                        {a.distanceKm != null && <span>🛣 {a.distanceKm} km</span>}
                         {a.offerCount > 0 && <span>💬 {a.offerCount} teklif</span>}
                       </div>
                       {a.description && (

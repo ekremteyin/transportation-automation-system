@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createAdvert } from '../../api/advertApi';
 import PageHeader from '../../components/common/PageHeader';
+import LocationPicker from '../../components/map/LocationPicker';
 
 const cargoTypes = ['Ev Eşyası', 'Ticari Yük', 'Palet', 'Makine', 'Araç', 'Diğer'];
 const cities = ['Adana','Ankara','Antalya','Bursa','Diyarbakır','Eskişehir','Gaziantep','İstanbul','İzmir','Kayseri','Konya','Mersin','Samsun','Trabzon'];
@@ -89,6 +90,19 @@ export default function AdvertCreate() {
               className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
         </div>
+
+        {/* Rota Önizlemesi */}
+        {(form.originCity || form.destCity) && (
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Rota Önizlemesi</label>
+            <div className="overflow-hidden rounded-xl border border-slate-200">
+              <LocationPicker
+                originCity={form.originCity} originDistrict={form.originDistrict}
+                destCity={form.destCity}   destDistrict={form.destDistrict}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Tarih */}
         <div>

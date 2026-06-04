@@ -19,6 +19,14 @@ public class Advert
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 
+    // Geo fields
+    public double? OriginLat { get; set; }
+    public double? OriginLng { get; set; }
+    public double? DestLat { get; set; }
+    public double? DestLng { get; set; }
+    public double? DistanceKm { get; set; }
+    public int? EstimatedDurationMin { get; set; }
+
     public User Sender { get; set; } = null!;
     public ICollection<Offer> Offers { get; set; } = [];
     public ICollection<Review> Reviews { get; set; } = [];

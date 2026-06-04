@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Sidebar from './components/common/Sidebar';
+import Navbar from './components/common/Navbar';
 
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
@@ -22,13 +23,18 @@ import UserManagement from './pages/admin/UserManagement';
 import AdvertManagement from './pages/admin/AdvertManagement';
 import Complaints from './pages/admin/Complaints';
 
+import MessagesPage from './pages/messages/MessagesPage';
+
 function AppLayout() {
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
-      <main className="flex-1 overflow-auto">
-        <Outlet />
-      </main>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Navbar />
+        <main className="flex-1 overflow-auto">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }
@@ -81,6 +87,15 @@ export default function App() {
             <Route path="users"            element={<UserManagement />} />
             <Route path="adverts"          element={<AdvertManagement />} />
             <Route path="complaints"       element={<Complaints />} />
+          </Route>
+
+          {/* Mesajlaşma (Sender + Carrier) */}
+          <Route path="/messages" element={
+            <ProtectedRoute allowedRoles={['Sender', 'Carrier']}>
+              <AppLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<MessagesPage />} />
           </Route>
 
           <Route path="/"  element={<Navigate to="/login" replace />} />

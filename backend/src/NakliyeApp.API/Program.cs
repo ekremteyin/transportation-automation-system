@@ -3,15 +3,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NakliyeApp.API.Middleware;
 using NakliyeApp.Application.Interfaces;
 using NakliyeApp.Application.Mappings;
 using NakliyeApp.Application.Services;
 using NakliyeApp.Infrastructure.Data;
 using NakliyeApp.Infrastructure.Repositories;
 using NakliyeApp.Infrastructure.Services;
-using NakliyeApp.API.Middleware;
-using NakliyeApp.Application.Interfaces;
-using NakliyeApp.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,11 +42,20 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly",   p => p.RequireRole("Admin"));
 });
 
+// GeoService (Nominatim + OSRM)
+builder.Services.AddHttpClient<IGeoService, GeoService>(client =>
+{
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("NakliyeApp/1.0");
+    client.Timeout = TimeSpan.FromSeconds(15);
+});
+
 // DI
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAdvertRepository, AdvertRepository>();
 builder.Services.AddScoped<IOfferRepository, OfferRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddScoped<AuthService>();
@@ -56,6 +63,8 @@ builder.Services.AddScoped<AdvertService>();
 builder.Services.AddScoped<OfferService>();
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<MessageService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

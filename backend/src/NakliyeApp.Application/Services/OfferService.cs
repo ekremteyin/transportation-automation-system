@@ -5,7 +5,7 @@ using NakliyeApp.Domain.Enums;
 
 namespace NakliyeApp.Application.Services;
 
-public class OfferService(IOfferRepository offerRepo, IAdvertRepository advertRepo)
+public class OfferService(IOfferRepository offerRepo, IAdvertRepository advertRepo, INotificationService notifService)
 {
     public async Task<OfferDto> CreateAsync(int carrierId, CreateOfferDto dto)
     {
@@ -31,6 +31,11 @@ public class OfferService(IOfferRepository offerRepo, IAdvertRepository advertRe
         };
 
         var created = await offerRepo.CreateAsync(offer);
+
+        await notifService.NotifyNewOfferAsync(
+            advert.SenderId, advert.Id,
+            $"{advert.OriginCity} → {advert.DestCity}");
+
         return MapToDto(created);
     }
 
@@ -82,6 +87,10 @@ public class OfferService(IOfferRepository offerRepo, IAdvertRepository advertRe
         advert.UpdatedAt = DateTime.UtcNow;
         await advertRepo.UpdateAsync(advert);
 
+        await notifService.NotifyOfferAcceptedAsync(
+            offer.CarrierId, offer.AdvertId,
+            $"{advert.OriginCity} → {advert.DestCity}");
+
         return MapToDto(offer);
     }
 
@@ -98,6 +107,11 @@ public class OfferService(IOfferRepository offerRepo, IAdvertRepository advertRe
 
         offer.Status = OfferStatus.Rejected;
         await offerRepo.UpdateAsync(offer);
+
+        await notifService.NotifyOfferRejectedAsync(
+            offer.CarrierId, offer.AdvertId,
+            $"{advert.OriginCity} → {advert.DestCity}");
+
         return MapToDto(offer);
     }
 
@@ -128,6 +142,11 @@ public class OfferService(IOfferRepository offerRepo, IAdvertRepository advertRe
         advert.Status = target;
         advert.UpdatedAt = DateTime.UtcNow;
         await advertRepo.UpdateAsync(advert);
+
+        await notifService.NotifyStatusUpdatedAsync(
+            advert.SenderId, advert.Id,
+            target.ToString(),
+            $"{advert.OriginCity} → {advert.DestCity}");
     }
 
     private static OfferDto MapToDto(Offer o) => new()

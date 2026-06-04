@@ -11,6 +11,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Offer> Offers => Set<Offer>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<Complaint> Complaints => Set<Complaint>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<Message> Messages => Set<Message>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -60,6 +62,31 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
              .WithMany()
              .HasForeignKey(r => r.ReviewedId)
              .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Message>(e =>
+        {
+            e.HasOne(m => m.Offer)
+             .WithMany()
+             .HasForeignKey(m => m.OfferId)
+             .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(m => m.Sender)
+             .WithMany()
+             .HasForeignKey(m => m.SenderId)
+             .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Notification>(e =>
+        {
+            e.Property(n => n.Type).HasConversion<string>();
+            e.HasOne(n => n.User)
+             .WithMany()
+             .HasForeignKey(n => n.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(n => n.Advert)
+             .WithMany()
+             .HasForeignKey(n => n.AdvertId)
+             .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<Complaint>(e =>
