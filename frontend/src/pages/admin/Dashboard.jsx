@@ -64,7 +64,6 @@ export default function AdminDashboard() {
         <StatCard label="Toplam İlan"        value={stats.totalAdverts}      icon="📋" color="blue" />
         <StatCard label="Açık İlan"          value={stats.openAdverts}       icon="🟢" color="green" />
         <StatCard label="Tamamlanan"         value={stats.completedAdverts}  icon="✅" color="green" />
-        <StatCard label="Bekleyen Şikayet"   value={stats.pendingComplaints} icon="⚠️" color="amber" />
       </div>
 
       {/* ── Grafikler ──────────────────────────────────────────── */}

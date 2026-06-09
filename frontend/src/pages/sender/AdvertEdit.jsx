@@ -2,24 +2,24 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getAdvertById, updateAdvert } from '../../api/advertApi';
 import PageHeader from '../../components/common/PageHeader';
+import PlaceAutocomplete from '../../components/common/PlaceAutocomplete';
 
 const cargoTypes = ['Ev Eşyası', 'Ticari Yük', 'Palet', 'Makine', 'Araç', 'Diğer'];
-const cities = ['Adana','Ankara','Antalya','Bursa','Diyarbakır','Eskişehir','Gaziantep','İstanbul','İzmir','Kayseri','Konya','Mersin','Samsun','Trabzon'];
 
 export default function AdvertEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [form, setForm] = useState(null);
-  const [error, setError] = useState('');
+  const [form, setForm]     = useState(null);
+  const [error, setError]   = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     getAdvertById(id).then(r => {
       const a = r.data;
       setForm({
-        cargoType: a.cargoType, cargoWeight: a.cargoWeight ?? '',
-        originCity: a.originCity, originDistrict: a.originDistrict ?? '',
-        destCity: a.destCity, destDistrict: a.destDistrict ?? '',
+        cargoType: a.cargoType,        cargoWeight: a.cargoWeight ?? '',
+        originCity: a.originCity,      originDistrict: a.originDistrict ?? '',
+        destCity: a.destCity,          destDistrict: a.destDistrict ?? '',
         transportDate: a.transportDate.split('T')[0],
         description: a.description ?? '',
       });
@@ -68,24 +68,48 @@ export default function AdvertEdit() {
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">Kalkış *</label>
           <div className="grid grid-cols-2 gap-3">
-            <select value={form.originCity} onChange={set('originCity')} required
-              className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-              {cities.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <input type="text" value={form.originDistrict} onChange={set('originDistrict')} placeholder="İlçe"
-              className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <PlaceAutocomplete
+              value={form.originCity}
+              onChange={(v) => setForm(p => ({ ...p, originCity: v }))}
+              onSelect={(name) => setForm(p => ({ ...p, originCity: name, originDistrict: '' }))}
+              mode="city"
+              placeholder="Şehir yazın..."
+              required
+            />
+            <PlaceAutocomplete
+              value={form.originDistrict}
+              onChange={(v) => setForm(p => ({ ...p, originDistrict: v }))}
+              onSelect={(name) => setForm(p => ({ ...p, originDistrict: name }))}
+              city={form.originCity}
+              mode="district"
+              city={form.originCity}
+              placeholder="İlçe seçin..."
+              disabled={!form.originCity}
+            />
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">Varış *</label>
           <div className="grid grid-cols-2 gap-3">
-            <select value={form.destCity} onChange={set('destCity')} required
-              className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-              {cities.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <input type="text" value={form.destDistrict} onChange={set('destDistrict')} placeholder="İlçe"
-              className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <PlaceAutocomplete
+              value={form.destCity}
+              onChange={(v) => setForm(p => ({ ...p, destCity: v }))}
+              onSelect={(name) => setForm(p => ({ ...p, destCity: name, destDistrict: '' }))}
+              mode="city"
+              placeholder="Şehir yazın..."
+              required
+            />
+            <PlaceAutocomplete
+              value={form.destDistrict}
+              onChange={(v) => setForm(p => ({ ...p, destDistrict: v }))}
+              onSelect={(name) => setForm(p => ({ ...p, destDistrict: name }))}
+              city={form.destCity}
+              mode="district"
+              city={form.destCity}
+              placeholder="İlçe seçin..."
+              disabled={!form.destCity}
+            />
           </div>
         </div>
 

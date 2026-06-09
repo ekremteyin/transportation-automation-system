@@ -3,20 +3,47 @@ import { useNavigate } from 'react-router-dom';
 import { createAdvert } from '../../api/advertApi';
 import PageHeader from '../../components/common/PageHeader';
 import LocationPicker from '../../components/map/LocationPicker';
+import PlaceAutocomplete from '../../components/common/PlaceAutocomplete';
 
 const cargoTypes = ['Ev Eşyası', 'Ticari Yük', 'Palet', 'Makine', 'Araç', 'Diğer'];
-const cities = ['Adana','Ankara','Antalya','Bursa','Diyarbakır','Eskişehir','Gaziantep','İstanbul','İzmir','Kayseri','Konya','Mersin','Samsun','Trabzon'];
 
 export default function AdvertCreate() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    cargoType: '', cargoWeight: '', originCity: '', originDistrict: '',
-    destCity: '', destDistrict: '', transportDate: '', description: '',
+    cargoType: '', cargoWeight: '',
+    originCity: '', originDistrict: '',
+    destCity: '',   destDistrict: '',
+    transportDate: '', description: '',
   });
-  const [error, setError] = useState('');
+  // Autocomplete seçiminden gelen koordinatlar — LocationPicker'a geçirilir
+  const [preview, setPreview] = useState({
+    originLat: null, originLng: null,
+    destLat: null,   destLng: null,
+  });
+  const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
 
   const set = (field) => (e) => setForm(p => ({ ...p, [field]: e.target.value }));
+
+  const handleOriginCitySelect = (name, coords) => {
+    setForm(p => ({ ...p, originCity: name, originDistrict: '' }));
+    if (coords) setPreview(p => ({ ...p, originLat: coords.lat, originLng: coords.lng }));
+  };
+
+  const handleOriginDistrictSelect = (name, coords) => {
+    setForm(p => ({ ...p, originDistrict: name }));
+    if (coords) setPreview(p => ({ ...p, originLat: coords.lat, originLng: coords.lng }));
+  };
+
+  const handleDestCitySelect = (name, coords) => {
+    setForm(p => ({ ...p, destCity: name, destDistrict: '' }));
+    if (coords) setPreview(p => ({ ...p, destLat: coords.lat, destLng: coords.lng }));
+  };
+
+  const handleDestDistrictSelect = (name, coords) => {
+    setForm(p => ({ ...p, destDistrict: name }));
+    if (coords) setPreview(p => ({ ...p, destLat: coords.lat, destLng: coords.lng }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,6 +59,8 @@ export default function AdvertCreate() {
       setLoading(false);
     }
   };
+
+  const showPreview = preview.originLat || preview.destLat;
 
   return (
     <div className="p-6 max-w-2xl">
@@ -65,14 +94,23 @@ export default function AdvertCreate() {
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">Kalkış Noktası *</label>
           <div className="grid grid-cols-2 gap-3">
-            <select value={form.originCity} onChange={set('originCity')} required
-              className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">Şehir seçin</option>
-              {cities.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <input type="text" value={form.originDistrict} onChange={set('originDistrict')}
-              placeholder="İlçe (opsiyonel)"
-              className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <PlaceAutocomplete
+              value={form.originCity}
+              onChange={(v) => setForm(p => ({ ...p, originCity: v }))}
+              onSelect={handleOriginCitySelect}
+              mode="city"
+              placeholder="Şehir yazın..."
+              required
+            />
+            <PlaceAutocomplete
+              value={form.originDistrict}
+              onChange={(v) => setForm(p => ({ ...p, originDistrict: v }))}
+              onSelect={handleOriginDistrictSelect}
+              mode="district"
+              city={form.originCity}
+              placeholder="İlçe seçin..."
+              disabled={!form.originCity}
+            />
           </div>
         </div>
 
@@ -80,25 +118,35 @@ export default function AdvertCreate() {
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">Varış Noktası *</label>
           <div className="grid grid-cols-2 gap-3">
-            <select value={form.destCity} onChange={set('destCity')} required
-              className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">Şehir seçin</option>
-              {cities.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <input type="text" value={form.destDistrict} onChange={set('destDistrict')}
-              placeholder="İlçe (opsiyonel)"
-              className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <PlaceAutocomplete
+              value={form.destCity}
+              onChange={(v) => setForm(p => ({ ...p, destCity: v }))}
+              onSelect={handleDestCitySelect}
+              mode="city"
+              placeholder="Şehir yazın..."
+              required
+            />
+            <PlaceAutocomplete
+              value={form.destDistrict}
+              onChange={(v) => setForm(p => ({ ...p, destDistrict: v }))}
+              onSelect={handleDestDistrictSelect}
+              mode="district"
+              city={form.destCity}
+              placeholder="İlçe seçin..."
+              disabled={!form.destCity}
+            />
           </div>
         </div>
 
         {/* Rota Önizlemesi */}
-        {(form.originCity || form.destCity) && (
+        {showPreview && (
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Rota Önizlemesi</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Konum Önizlemesi</label>
             <div className="overflow-hidden rounded-xl border border-slate-200">
               <LocationPicker
-                originCity={form.originCity} originDistrict={form.originDistrict}
-                destCity={form.destCity}   destDistrict={form.destDistrict}
+                originLat={preview.originLat} originLng={preview.originLng}
+                destLat={preview.destLat}     destLng={preview.destLng}
+                originLabel={form.originCity} destLabel={form.destCity}
               />
             </div>
           </div>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NakliyeApp.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using NakliyeApp.Infrastructure.Data;
 namespace NakliyeApp.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608184947_AddRouteCoordinatesJson")]
+    partial class AddRouteCoordinatesJson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,6 +81,9 @@ namespace NakliyeApp.Infrastructure.Data.Migrations
                     b.Property<string>("PhotoPath")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("RouteCoordinatesJson")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("SenderId")
                         .HasColumnType("int");
 
@@ -96,6 +102,45 @@ namespace NakliyeApp.Infrastructure.Data.Migrations
                     b.HasIndex("SenderId");
 
                     b.ToTable("Adverts");
+                });
+
+            modelBuilder.Entity("NakliyeApp.Domain.Entities.Complaint", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AdvertId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ReporterId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TargetId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdvertId");
+
+                    b.HasIndex("ReporterId");
+
+                    b.HasIndex("TargetId");
+
+                    b.ToTable("Complaints");
                 });
 
             modelBuilder.Entity("NakliyeApp.Domain.Entities.Message", b =>
@@ -327,6 +372,31 @@ namespace NakliyeApp.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("NakliyeApp.Domain.Entities.Complaint", b =>
+                {
+                    b.HasOne("NakliyeApp.Domain.Entities.Advert", "Advert")
+                        .WithMany()
+                        .HasForeignKey("AdvertId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("NakliyeApp.Domain.Entities.User", "Reporter")
+                        .WithMany()
+                        .HasForeignKey("ReporterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NakliyeApp.Domain.Entities.User", "Target")
+                        .WithMany()
+                        .HasForeignKey("TargetId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Advert");
+
+                    b.Navigation("Reporter");
+
+                    b.Navigation("Target");
                 });
 
             modelBuilder.Entity("NakliyeApp.Domain.Entities.Message", b =>

@@ -10,7 +10,6 @@ public class AdminStatsDto
     public int OpenAdverts { get; set; }
     public int CompletedAdverts { get; set; }
     public int TotalOffers { get; set; }
-    public int PendingComplaints { get; set; }
 
     // Grafik verileri
     public IEnumerable<MonthlyCountDto> MonthlyUserRegistrations { get; set; } = [];

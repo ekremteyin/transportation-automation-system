@@ -30,7 +30,6 @@ public class AdminController(AdminService adminService, AppDbContext db) : Contr
             OpenAdverts       = await db.Adverts.CountAsync(a => a.Status == AdvertStatus.Open),
             CompletedAdverts  = await db.Adverts.CountAsync(a => a.Status == AdvertStatus.Completed),
             TotalOffers       = await db.Offers.CountAsync(),
-            PendingComplaints = await db.Complaints.CountAsync(c => c.Status == "Pending"),
         };
 
         // ── Aylık kullanıcı kayıtları (son 6 ay) ──────────────────────
@@ -119,36 +118,4 @@ public class AdminController(AdminService adminService, AppDbContext db) : Contr
         return NoContent();
     }
 
-    [HttpGet("complaints")]
-    public async Task<IActionResult> GetComplaints()
-    {
-        var complaints = await db.Complaints
-            .Include(c => c.Reporter)
-            .Include(c => c.Target)
-            .OrderByDescending(c => c.CreatedAt)
-            .Select(c => new
-            {
-                c.Id,
-                c.Description,
-                c.Status,
-                c.CreatedAt,
-                ReporterName = c.Reporter.FirstName + " " + c.Reporter.LastName,
-                TargetName = c.Target != null ? c.Target.FirstName + " " + c.Target.LastName : null,
-                c.AdvertId
-            })
-            .ToListAsync();
-        return Ok(complaints);
-    }
-
-    [HttpPut("complaints/{id:int}/resolve")]
-    public async Task<IActionResult> ResolveComplaint(int id, [FromBody] ResolveComplaintDto dto)
-    {
-        var complaint = await db.Complaints.FindAsync(id)
-            ?? throw new KeyNotFoundException("Şikayet bulunamadı.");
-        complaint.Status = dto.Status;
-        await db.SaveChangesAsync();
-        return NoContent();
-    }
 }
-
-public record ResolveComplaintDto(string Status);

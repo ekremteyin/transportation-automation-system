@@ -18,7 +18,6 @@ const adminLinks = [
   { to: '/admin', label: 'Dashboard', icon: '▦' },
   { to: '/admin/users', label: 'Kullanıcılar', icon: '👥' },
   { to: '/admin/adverts', label: 'İlanlar', icon: '📋' },
-  { to: '/admin/complaints', label: 'Şikayetler', icon: '⚠️' },
 ];
 
 export default function Sidebar() {

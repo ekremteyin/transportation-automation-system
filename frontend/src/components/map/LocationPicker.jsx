@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// divIcon kullanarak PNG import sorununu atlatıyoruz
 const makeIcon = (color, label) => L.divIcon({
   className: '',
   html: `<div style="width:28px;height:28px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 2px 5px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:13px;line-height:1">${label}</div>`,
@@ -33,7 +32,8 @@ async function geocode(city, district) {
   try {
     const q = district ? `${district},${city},Turkey` : `${city},Turkey`;
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&countrycodes=tr`
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&countrycodes=tr`,
+      { headers: { 'Accept-Language': 'tr', 'User-Agent': 'NakliyeApp/1.0' } }
     );
     const data = await res.json();
     if (!data.length) return null;
@@ -46,7 +46,7 @@ async function geocode(city, district) {
 export default function LocationPicker({
   // Kayıtlı koordinatlar (AdvertDetail için)
   originLat, originLng, destLat, destLng,
-  // Şehir isimleri (AdvertCreate önizleme için)
+  // Şehir isimleri (geocode fallback için)
   originCity, originDistrict,
   destCity, destDistrict,
   // Popup etiketleri
@@ -68,7 +68,6 @@ export default function LocationPicker({
     geocode(destCity, destDistrict).then(r => setDest(r));
   }, [destLat, destLng, destCity, destDistrict]);
 
-  // En az bir koordinat olmadan harita render edilmez
   if (!origin && !dest) return null;
 
   const center = origin
@@ -95,12 +94,6 @@ export default function LocationPicker({
         <Marker position={[dest.lat, dest.lng]} icon={DEST_ICON}>
           <Popup>{destLabel || destCity || 'Varış'}</Popup>
         </Marker>
-      )}
-      {origin && dest && (
-        <Polyline
-          positions={[[origin.lat, origin.lng], [dest.lat, dest.lng]]}
-          pathOptions={{ color: '#2563eb', weight: 2.5, dashArray: '8 5', opacity: 0.8 }}
-        />
       )}
       <FitBounds origin={origin} dest={dest} />
     </MapContainer>

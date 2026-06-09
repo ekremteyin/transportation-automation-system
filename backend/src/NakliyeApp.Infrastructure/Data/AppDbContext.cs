@@ -10,7 +10,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Advert> Adverts => Set<Advert>();
     public DbSet<Offer> Offers => Set<Offer>();
     public DbSet<Review> Reviews => Set<Review>();
-    public DbSet<Complaint> Complaints => Set<Complaint>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<Message> Messages => Set<Message>();
 
@@ -86,22 +85,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasOne(n => n.Advert)
              .WithMany()
              .HasForeignKey(n => n.AdvertId)
-             .OnDelete(DeleteBehavior.SetNull);
-        });
-
-        modelBuilder.Entity<Complaint>(e =>
-        {
-            e.HasOne(c => c.Reporter)
-             .WithMany()
-             .HasForeignKey(c => c.ReporterId)
-             .OnDelete(DeleteBehavior.Restrict);
-            e.HasOne(c => c.Target)
-             .WithMany()
-             .HasForeignKey(c => c.TargetId)
-             .OnDelete(DeleteBehavior.SetNull);
-            e.HasOne(c => c.Advert)
-             .WithMany()
-             .HasForeignKey(c => c.AdvertId)
              .OnDelete(DeleteBehavior.SetNull);
         });
 

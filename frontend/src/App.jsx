@@ -21,8 +21,6 @@ import ActiveJobs from './pages/carrier/ActiveJobs';
 import AdminDashboard from './pages/admin/Dashboard';
 import UserManagement from './pages/admin/UserManagement';
 import AdvertManagement from './pages/admin/AdvertManagement';
-import Complaints from './pages/admin/Complaints';
-
 import MessagesPage from './pages/messages/MessagesPage';
 
 function AppLayout() {
@@ -86,7 +84,6 @@ export default function App() {
             <Route index                   element={<AdminDashboard />} />
             <Route path="users"            element={<UserManagement />} />
             <Route path="adverts"          element={<AdvertManagement />} />
-            <Route path="complaints"       element={<Complaints />} />
           </Route>
 
           {/* Mesajlaşma (Sender + Carrier) */}
