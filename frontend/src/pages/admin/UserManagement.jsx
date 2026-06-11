@@ -1,9 +1,19 @@
 import { useEffect, useState } from 'react';
 import { getAdminUsers, toggleUser } from '../../api/adminApi';
-import PageHeader from '../../components/common/PageHeader';
 
 const roleLabel = { Sender: 'Gönderici', Carrier: 'Taşıyıcı' };
-const roleColor = { Sender: 'bg-blue-100 text-blue-700', Carrier: 'bg-amber-100 text-amber-700' };
+const roleColor  = {
+  Sender:  'bg-teal-100 text-teal-700',
+  Carrier: 'bg-amber-100 text-amber-700',
+};
+
+function Avatar({ name }) {
+  return (
+    <div className="w-7 h-7 rounded-full bg-slate-200 text-slate-600 text-xs font-semibold flex items-center justify-center shrink-0">
+      {name?.[0]?.toUpperCase() ?? '?'}
+    </div>
+  );
+}
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -24,13 +34,11 @@ export default function UserManagement() {
   };
 
   return (
-    <div className="p-6 max-w-5xl">
-      <PageHeader
-        title="Kullanıcı Yönetimi"
-        subtitle={`${users.length} kullanıcı`}
-      />
-
+    <div className="p-5 max-w-5xl">
       <div className="bg-white rounded-xl border border-slate-200">
+        <div className="px-5 py-4 border-b border-slate-100 flex items-center">
+          <span className="text-xs text-slate-400">{users.length} kullanıcı</span>
+        </div>
         {loading ? (
           <div className="p-10 text-center text-slate-400">Yükleniyor...</div>
         ) : (
@@ -49,7 +57,12 @@ export default function UserManagement() {
             <tbody className="divide-y divide-slate-100">
               {users.map(u => (
                 <tr key={u.id} className={`hover:bg-slate-50 transition ${!u.isActive ? 'opacity-50' : ''}`}>
-                  <td className="px-5 py-3 font-medium text-slate-800">{u.firstName} {u.lastName}</td>
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-2.5">
+                      <Avatar name={u.firstName} />
+                      <span className="font-medium text-slate-800">{u.firstName} {u.lastName}</span>
+                    </div>
+                  </td>
                   <td className="px-5 py-3 text-slate-500">{u.email}</td>
                   <td className="px-5 py-3">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${roleColor[u.role]}`}>
@@ -59,13 +72,15 @@ export default function UserManagement() {
                   <td className="px-5 py-3 text-slate-500">
                     {u.vehicleType ? `${u.vehicleType} · ${u.city}` : '—'}
                   </td>
-                  <td className="px-5 py-3 text-slate-600">
+                  <td className="px-5 py-3">
                     {u.ratingCount > 0 ? (
                       <span className="text-amber-500">★ {u.averageRating.toFixed(1)}</span>
-                    ) : '—'}
+                    ) : <span className="text-slate-400">—</span>}
                   </td>
                   <td className="px-5 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                      u.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                    }`}>
                       {u.isActive ? 'Aktif' : 'Pasif'}
                     </span>
                   </td>
@@ -73,11 +88,7 @@ export default function UserManagement() {
                     <button
                       onClick={() => handleToggle(u.id)}
                       disabled={toggling === u.id}
-                      className={`text-xs px-3 py-1 rounded-lg font-medium border transition disabled:opacity-60 ${
-                        u.isActive
-                          ? 'border-red-200 text-red-600 hover:bg-red-50'
-                          : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'
-                      }`}>
+                      className="text-xs px-3 py-1 rounded-lg font-medium border border-slate-200 text-slate-600 hover:bg-slate-100 transition disabled:opacity-60">
                       {toggling === u.id ? '...' : u.isActive ? 'Pasif Yap' : 'Aktif Yap'}
                     </button>
                   </td>

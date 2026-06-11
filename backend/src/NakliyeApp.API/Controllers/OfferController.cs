@@ -37,6 +37,14 @@ public class OfferController(OfferService offerService) : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("offers/carrier-stats")]
+    [Authorize(Roles = "Carrier")]
+    public async Task<IActionResult> GetCarrierStats()
+    {
+        var result = await offerService.GetCarrierStatsAsync(UserId);
+        return Ok(result);
+    }
+
     [HttpPut("offers/{id:int}/accept")]
     [Authorize(Roles = "Sender")]
     public async Task<IActionResult> Accept(int id)

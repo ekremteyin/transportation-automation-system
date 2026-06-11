@@ -3,16 +3,62 @@ import { Link, useNavigate } from 'react-router-dom';
 import { register as registerApi } from '../../api/authApi';
 import { useAuth } from '../../context/AuthContext';
 
+const inputStyle = {
+  width: '100%',
+  padding: '9px 12px',
+  fontSize: 14,
+  border: '1px solid #e5e7eb',
+  borderRadius: 6,
+  outline: 'none',
+  boxSizing: 'border-box',
+  color: '#111827',
+  transition: 'border-color 0.15s',
+};
+
+const labelStyle = {
+  display: 'block',
+  fontSize: 13,
+  fontWeight: 500,
+  color: '#374151',
+  marginBottom: 5,
+};
+
+function Field({ label, children }) {
+  return (
+    <div>
+      <label style={labelStyle}>{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function Input({ onFocus, onBlur, ...props }) {
+  return (
+    <input
+      style={inputStyle}
+      onFocus={e => e.target.style.borderColor = '#6366f1'}
+      onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+      {...props}
+    />
+  );
+}
+
+function Select({ ...props }) {
+  return (
+    <select
+      style={{ ...inputStyle, background: '#fff' }}
+      onFocus={e => e.target.style.borderColor = '#6366f1'}
+      onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+      {...props}
+    />
+  );
+}
+
 export default function RegisterPage() {
   const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    phone: '',
-    role: 'Sender',
-    vehicleType: '',
-    city: '',
+    firstName: '', lastName: '', email: '',
+    password: '', phone: '', role: 'Sender',
+    vehicleType: '', city: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -52,136 +98,116 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-10">
-      <div className="bg-white rounded-2xl shadow-md w-full max-w-lg p-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Kayıt Ol</h1>
+    <div style={{
+      minHeight: '100vh',
+      background: '#0f172a',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '32px 16px',
+    }}>
+      <div style={{
+        width: 420,
+        background: '#ffffff',
+        borderRadius: 12,
+        border: '1px solid #e5e7eb',
+        padding: '36px 40px',
+      }}>
+        {/* Başlık */}
+        <h1 style={{ fontSize: 20, fontWeight: 500, color: '#111827', margin: 0 }}>
+          Hesap oluştur
+        </h1>
+        <p style={{ fontSize: 13, color: '#6b7280', marginTop: 6, marginBottom: 24 }}>
+          Platforma katılmak için bilgilerinizi girin
+        </p>
 
+        {/* Hata */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
+          <div style={{
+            background: '#fef2f2',
+            border: '1px solid #fecaca',
+            color: '#b91c1c',
+            fontSize: 13,
+            borderRadius: 6,
+            padding: '10px 12px',
+            marginBottom: 16,
+          }}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ad</label>
-              <input
-                type="text"
-                name="firstName"
-                value={form.firstName}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Soyad</label>
-              <input
-                type="text"
-                name="lastName"
-                value={form.lastName}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* Ad / Soyad */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <Field label="Ad">
+              <Input type="text" name="firstName" value={form.firstName} onChange={handleChange} required />
+            </Field>
+            <Field label="Soyad">
+              <Input type="text" name="lastName" value={form.lastName} onChange={handleChange} required />
+            </Field>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">E-posta</label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <Field label="E-posta">
+            <Input type="email" name="email" value={form.email} onChange={handleChange} required placeholder="ornek@email.com" />
+          </Field>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Şifre</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              minLength={6}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <Field label="Şifre">
+            <Input type="password" name="password" value={form.password} onChange={handleChange} required minLength={6} placeholder="••••••••" />
+          </Field>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Telefon (opsiyonel)</label>
-            <input
-              type="tel"
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="05XX XXX XX XX"
-            />
-          </div>
+          <Field label="Telefon (opsiyonel)">
+            <Input type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="05XX XXX XX XX" />
+          </Field>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Hesap Türü</label>
-            <select
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+          <Field label="Hesap Türü">
+            <Select name="role" value={form.role} onChange={handleChange}>
               <option value="Sender">Gönderici</option>
               <option value="Carrier">Taşıyıcı</option>
-            </select>
-          </div>
+            </Select>
+          </Field>
 
           {form.role === 'Carrier' && (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Araç Tipi</label>
-                <select
-                  name="vehicleType"
-                  value={form.vehicleType}
-                  onChange={handleChange}
-                  required
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <Field label="Araç Tipi">
+                <Select name="vehicleType" value={form.vehicleType} onChange={handleChange} required>
                   <option value="">Seçin</option>
                   <option value="Kamyonet">Kamyonet</option>
                   <option value="Kamyon">Kamyon</option>
                   <option value="TIR">TIR</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Şehir</label>
-                <input
-                  type="text"
-                  name="city"
-                  value={form.city}
-                  onChange={handleChange}
-                  required
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="İstanbul"
-                />
-              </div>
+                </Select>
+              </Field>
+              <Field label="Şehir">
+                <Input type="text" name="city" value={form.city} onChange={handleChange} required placeholder="İstanbul" />
+              </Field>
             </div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-60 transition"
+            style={{
+              width: '100%',
+              padding: '10px 0',
+              marginTop: 8,
+              background: loading ? '#a5b4fc' : '#6366f1',
+              color: '#ffffff',
+              fontSize: 14,
+              fontWeight: 500,
+              border: 'none',
+              borderRadius: 6,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={e => { if (!loading) e.target.style.background = '#4f46e5'; }}
+            onMouseLeave={e => { if (!loading) e.target.style.background = '#6366f1'; }}
           >
             {loading ? 'Kayıt yapılıyor...' : 'Kayıt Ol'}
           </button>
         </form>
 
-        <p className="text-sm text-center text-gray-500 mt-4">
+        <p style={{ textAlign: 'center', fontSize: 13, color: '#6b7280', marginTop: 20, marginBottom: 0 }}>
           Zaten hesabın var mı?{' '}
-          <Link to="/login" className="text-blue-600 hover:underline font-medium">
+          <Link to="/login" style={{ color: '#6366f1', textDecoration: 'none', fontWeight: 500 }}>
             Giriş Yap
           </Link>
         </p>

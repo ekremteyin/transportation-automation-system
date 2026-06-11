@@ -5,7 +5,6 @@ import {
 } from 'recharts';
 import { getAdminStats } from '../../api/adminApi';
 import StatCard from '../../components/common/StatCard';
-import PageHeader from '../../components/common/PageHeader';
 
 function SectionCard({ title, children }) {
   return (
@@ -41,32 +40,31 @@ export default function AdminDashboard() {
   }, []);
 
   if (!stats) {
-    return (
-      <div className="p-6">
-        <PageHeader title="Admin Paneli" subtitle="Sistemin genel durumu." />
-        <div className="text-slate-400 text-sm mt-6">Yükleniyor...</div>
-      </div>
-    );
+    return <div className="p-6 text-slate-400 text-sm">Yükleniyor...</div>;
   }
 
   const maxCityCount = stats.topCitiesByAdverts[0]?.count ?? 1;
 
   return (
-    <div className="p-6 max-w-6xl space-y-6">
-      <PageHeader title="Admin Paneli" subtitle="Sistemin genel durumu." />
+    <div className="p-5 max-w-6xl space-y-5">
 
-      {/* ── Sayı Kartları ──────────────────────────────────────── */}
+      {/* Satır 1 — 4 kart */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Toplam Kullanıcı"  value={stats.totalUsers}        icon="👥" color="blue" />
-        <StatCard label="Gönderici"          value={stats.totalSenders}      icon="📦" color="purple" />
-        <StatCard label="Taşıyıcı"           value={stats.totalCarriers}     icon="🚛" color="amber" />
-        <StatCard label="Toplam Teklif"      value={stats.totalOffers}       icon="💬" color="purple" />
-        <StatCard label="Toplam İlan"        value={stats.totalAdverts}      icon="📋" color="blue" />
-        <StatCard label="Açık İlan"          value={stats.openAdverts}       icon="🟢" color="green" />
-        <StatCard label="Tamamlanan"         value={stats.completedAdverts}  icon="✅" color="green" />
+        <StatCard label="Toplam Kullanıcı" value={stats.totalUsers}    icon="👥" color="blue"   />
+        <StatCard label="Gönderici"         value={stats.totalSenders}  icon="📦" color="teal"   />
+        <StatCard label="Taşıyıcı"          value={stats.totalCarriers} icon="🚛" color="rose"   />
+        <StatCard label="Toplam Teklif"     value={stats.totalOffers}   icon="💬" color="amber"  />
       </div>
 
-      {/* ── Grafikler ──────────────────────────────────────────── */}
+      {/* Satır 2 — 3 kart */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="Toplam İlan"  value={stats.totalAdverts}     icon="📋" color="purple" />
+        <StatCard label="Açık İlan"    value={stats.openAdverts}      icon="🟢" color="blue"   />
+        <StatCard label="Tamamlanan"   value={stats.completedAdverts} icon="✅" color="green"  />
+        <div />
+      </div>
+
+      {/* Grafikler */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <SectionCard title="Son 6 Ay — Kullanıcı Kayıtları">
           <ResponsiveContainer width="100%" height={200}>
@@ -74,11 +72,7 @@ export default function AdminDashboard() {
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
               <XAxis dataKey="month" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <Tooltip
-                contentStyle={chartTooltipStyle}
-                formatter={(v) => [v, 'Kullanıcı']}
-                cursor={{ fill: '#f8fafc' }}
-              />
+              <Tooltip contentStyle={chartTooltipStyle} formatter={(v) => [v, 'Kullanıcı']} cursor={{ fill: '#f8fafc' }} />
               <Bar dataKey="count" fill="#2563eb" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -90,21 +84,16 @@ export default function AdminDashboard() {
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
               <XAxis dataKey="month" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} allowDecimals={false} />
-              <Tooltip
-                contentStyle={chartTooltipStyle}
-                formatter={(v) => [v, 'İlan']}
-                cursor={{ fill: '#f8fafc' }}
-              />
+              <Tooltip contentStyle={chartTooltipStyle} formatter={(v) => [v, 'İlan']} cursor={{ fill: '#f8fafc' }} />
               <Bar dataKey="count" fill="#10b981" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </SectionCard>
       </div>
 
-      {/* ── Listeler ───────────────────────────────────────────── */}
+      {/* Listeler */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
-        {/* En çok ilan oluşturulan şehirler */}
         <SectionCard title="En Çok İlan Oluşturulan Şehirler">
           {stats.topCitiesByAdverts.length === 0 ? (
             <p className="text-sm text-slate-400 text-center py-4">Henüz ilan yok.</p>
@@ -133,7 +122,6 @@ export default function AdminDashboard() {
           )}
         </SectionCard>
 
-        {/* En yüksek puanlı taşıyıcılar */}
         <SectionCard title="En Yüksek Puanlı Taşıyıcılar">
           {stats.topRatedCarriers.length === 0 ? (
             <p className="text-sm text-slate-400 text-center py-4">Henüz değerlendirme yok.</p>

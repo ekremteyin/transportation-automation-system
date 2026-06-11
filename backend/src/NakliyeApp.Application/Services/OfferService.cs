@@ -149,11 +149,19 @@ public class OfferService(IOfferRepository offerRepo, IAdvertRepository advertRe
             $"{advert.OriginCity} → {advert.DestCity}");
     }
 
+    public async Task<CarrierStatsDto> GetCarrierStatsAsync(int carrierId)
+    {
+        var completedJobs = await offerRepo.CountCompletedJobsAsync(carrierId);
+        return new CarrierStatsDto { CompletedJobs = completedJobs };
+    }
+
     private static OfferDto MapToDto(Offer o) => new()
     {
         Id = o.Id,
         AdvertId = o.AdvertId,
         AdvertRoute = o.Advert != null ? $"{o.Advert.OriginCity} → {o.Advert.DestCity}" : "",
+        CargoType = o.Advert?.CargoType,
+        TransportDate = o.Advert?.TransportDate,
         CarrierId = o.CarrierId,
         CarrierName = o.Carrier != null ? $"{o.Carrier.FirstName} {o.Carrier.LastName}" : "",
         CarrierVehicleType = o.Carrier?.VehicleType,

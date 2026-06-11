@@ -19,7 +19,10 @@ export default function ActiveJobs() {
   const load = () => {
     setLoading(true);
     getMyOffers()
-      .then(r => setJobs(r.data.filter(o => o.status === 'Accepted')))
+      .then(r => setJobs(r.data.filter(o => {
+        const advStatus = o.advertStatus ?? 'Matched';
+        return o.status === 'Accepted' && (advStatus === 'Matched' || advStatus === 'InProgress');
+      })))
       .finally(() => setLoading(false));
   };
 
@@ -89,7 +92,7 @@ export default function ActiveJobs() {
                       </div>
 
                       <div className="text-sm text-slate-500 space-y-0.5">
-                        <p>💰 Teklif: <span className="font-semibold text-slate-700">₺{job.price.toLocaleString('tr-TR')}</span></p>
+                        <p>Teklif: <span className="font-semibold text-slate-700">₺{job.price.toLocaleString('tr-TR')}</span></p>
                         {job.estimatedDate && (
                           <p>📅 Tahmini teslim: {new Date(job.estimatedDate).toLocaleDateString('tr-TR')}</p>
                         )}

@@ -11,4 +11,5 @@ public interface IOfferRepository
     Task<Offer> CreateAsync(Offer offer);
     Task UpdateAsync(Offer offer);
     Task UpdateRangeAsync(IEnumerable<Offer> offers);
+    Task<int> CountCompletedJobsAsync(int carrierId);
 }

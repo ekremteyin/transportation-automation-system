@@ -17,6 +17,7 @@ import CarrierDashboard from './pages/carrier/Dashboard';
 import OpenAdverts from './pages/carrier/OpenAdverts';
 import MyOffers from './pages/carrier/MyOffers';
 import ActiveJobs from './pages/carrier/ActiveJobs';
+import CarrierHistory from './pages/carrier/CarrierHistory';
 
 import AdminDashboard from './pages/admin/Dashboard';
 import UserManagement from './pages/admin/UserManagement';
@@ -25,7 +26,7 @@ import MessagesPage from './pages/messages/MessagesPage';
 
 function AppLayout() {
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-slate-100">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar />
@@ -73,6 +74,7 @@ export default function App() {
             <Route path="open-adverts"     element={<OpenAdverts />} />
             <Route path="my-offers"        element={<MyOffers />} />
             <Route path="active-jobs"      element={<ActiveJobs />} />
+            <Route path="history"          element={<CarrierHistory />} />
           </Route>
 
           {/* Admin */}

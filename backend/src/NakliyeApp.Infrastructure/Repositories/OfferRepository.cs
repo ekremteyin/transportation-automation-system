@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NakliyeApp.Application.Interfaces;
 using NakliyeApp.Domain.Entities;
+using NakliyeApp.Domain.Enums;
 using NakliyeApp.Infrastructure.Data;
 
 namespace NakliyeApp.Infrastructure.Repositories;
@@ -49,4 +50,11 @@ public class OfferRepository(AppDbContext db) : IOfferRepository
         db.Offers.UpdateRange(offers);
         await db.SaveChangesAsync();
     }
+
+    public async Task<int> CountCompletedJobsAsync(int carrierId) =>
+        await db.Offers
+            .Where(o => o.CarrierId == carrierId
+                     && o.Status == OfferStatus.Accepted
+                     && o.Advert!.Status == AdvertStatus.Completed)
+            .CountAsync();
 }

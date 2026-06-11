@@ -4,34 +4,18 @@ import StatusBadge from '../../components/common/StatusBadge';
 import PageHeader from '../../components/common/PageHeader';
 import OfferModal from '../../components/offer/OfferModal';
 
-const cities = ['','Adana','Ankara','Antalya','Bursa','Diyarbakır','Eskişehir','Gaziantep','İstanbul','İzmir','Kayseri','Konya','Mersin','Samsun','Trabzon'];
-const cargoTypes = ['','Ev Eşyası','Ticari Yük','Palet','Makine','Araç','Diğer'];
-
 export default function OpenAdverts() {
   const [adverts, setAdverts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ city: '', cargoType: '', transportDate: '' });
   const [selectedAdvert, setSelectedAdvert] = useState(null);
   const [successId, setSuccessId] = useState(null);
 
-  const load = (f = filters) => {
+  const load = () => {
     setLoading(true);
-    const params = {};
-    if (f.city) params.city = f.city;
-    if (f.cargoType) params.cargoType = f.cargoType;
-    if (f.transportDate) params.transportDate = f.transportDate;
-    getOpenAdverts(params).then(r => setAdverts(r.data)).finally(() => setLoading(false));
+    getOpenAdverts({}).then(r => setAdverts(r.data)).finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, []);
-
-  const setF = (field) => (e) => setFilters(p => ({ ...p, [field]: e.target.value }));
-  const handleFilter = (e) => { e.preventDefault(); load(); };
-  const handleReset = () => {
-    const reset = { city: '', cargoType: '', transportDate: '' };
-    setFilters(reset);
-    load(reset);
-  };
 
   const handleOfferSuccess = () => {
     setSuccessId(selectedAdvert.id);
@@ -43,46 +27,13 @@ export default function OpenAdverts() {
     <div className="p-6 max-w-5xl">
       <PageHeader title="Açık İlanlar" subtitle="Teklif vermek istediğiniz ilanı seçin." />
 
-      {/* Filtreler */}
-      <form onSubmit={handleFilter}
-        className="bg-white rounded-xl border border-slate-200 p-4 mb-5 flex flex-wrap items-end gap-3">
-        <div>
-          <label className="block text-xs text-slate-500 mb-1">Şehir</label>
-          <select value={filters.city} onChange={setF('city')}
-            className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-36">
-            {cities.map(c => <option key={c} value={c}>{c || 'Tümü'}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs text-slate-500 mb-1">Yük Türü</label>
-          <select value={filters.cargoType} onChange={setF('cargoType')}
-            className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-36">
-            {cargoTypes.map(t => <option key={t} value={t}>{t || 'Tümü'}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs text-slate-500 mb-1">Tarih</label>
-          <input type="date" value={filters.transportDate} onChange={setF('transportDate')}
-            className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        </div>
-        <button type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition">
-          Filtrele
-        </button>
-        <button type="button" onClick={handleReset}
-          className="px-4 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-100 transition">
-          Temizle
-        </button>
-      </form>
-
-      {/* Liste */}
       <div className="bg-white rounded-xl border border-slate-200">
         {loading ? (
           <div className="p-10 text-center text-slate-400">Yükleniyor...</div>
         ) : adverts.length === 0 ? (
           <div className="p-10 text-center text-slate-400">
             <p className="text-4xl mb-2">🔍</p>
-            <p>Filtrelere uygun ilan bulunamadı.</p>
+            <p>Şu an açık ilan bulunmuyor.</p>
           </div>
         ) : (
           <>
@@ -105,7 +56,7 @@ export default function OpenAdverts() {
                         )}
                       </div>
                       <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500">
-                        <span>📦 {a.cargoType}{a.cargoWeight ? ` · ${a.cargoWeight}` : ''}</span>
+                        <span>{a.cargoType}{a.cargoWeight ? ` · ${a.cargoWeight}` : ''}</span>
                         <span>📅 {new Date(a.transportDate).toLocaleDateString('tr-TR')}</span>
                         <span>👤 {a.senderName}</span>
                         {a.distanceKm != null && <span>🛣 {a.distanceKm} km</span>}
